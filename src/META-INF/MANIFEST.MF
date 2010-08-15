@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+BOSS-Plugin-Id: boss.turnitin
+BOSS-Plugin-Name: TurnItIn Plugin
+BOSS-Plugin-Version: 1.0.0
+BOSS-Plugin-Author: Thach Tran
+BOSS-Plugin-Email: tranngocthachs@gmail.com
+BOSS-Plugin-Description: Plagiarism detection plugin for essay submissions utilising TurnItIn web services
