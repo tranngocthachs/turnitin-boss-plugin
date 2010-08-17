@@ -9,23 +9,32 @@
 		<script type="text/javascript" src="$context.getStaticPath()/js/targethack.js"></script>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 		<script type="text/javascript">
-			$(function(){
-				$(':checkbox').click(
-				function () {
-					var temp = this.id;
-					var elem = $('input[name='+temp+']');
-					if ($(this).is(':checked')) {
-						elem.each(function() {
-							$(this).removeAttr('disabled'); 
-						});
-					}
-					else {
-						elem.each(function() { $(this).attr('disabled', true); });
-					}
-				}
-				);	
-			});
-		</script>
+	        $(document).ready(function(){
+	            $('.files').click(function(){
+	                var temp = this.id;
+	                var elem = $('input[name=' + temp + ']');
+	                if ($(this).is(':checked')) {
+	                    elem.each(function(){
+	                        $(this).removeAttr('disabled');
+	                    });
+	                }
+	                else {
+	                    elem.each(function(){
+	                        $(this).attr('disabled', true);
+	                    });
+	                }
+	            });
+				$('.config').click(function(){
+					if (!$(this).is(':checked')) {
+						var num = $('input[type=checkbox][class=config]:checked').size();
+	                    if (num == 0) {
+							alert("At least one target has to be selected");
+							$(this).attr('checked', true);
+						}
+	                }	
+				});
+	        });		
+        </script>
 	</head>
 	
 	<body>
@@ -50,13 +59,13 @@
 		</div>	
 					
 		<div class="table">
-			<form action="$context.getPageUrl("staff", "perform_turnitin_submit")?assignment=$assignment.getId()" method="POST">
+			<form action="$context.getPageUrl("staff", "perform_turnitin_submit")" method="POST">
 			<table class="full">
 				<thead>
 					<tr>
 						<th>To Send</th>
                         <th>Name</th>
-                        <th>File to Send</th>
+                        <th>Files</th>
                         <th>Status</th>
 					</tr>
 				</thead>
@@ -65,11 +74,11 @@
 				#foreach($submission in $submissions)
 				#if($submission.getSubmission().getActive())
 					#set($sub = $submission.getSubmission())
-					#set($sent = $submitted.get($sub.getId()))
+					#set($sent = $submitted.containsKey($sub.getId()))
 					<tr class="$style">
 						<td>
 							<p>
-                                <input type="checkbox" id="$submission.getSubmission().getId()" #if(!$sent)checked="true" #else disabled="true" #end/>
+                                <input class="files" type="checkbox" id="$submission.getSubmission().getId()" #if(!$sent)checked="true" #else disabled="true" #end/>
                             </p>
 						</td>
 						<td>
@@ -88,18 +97,24 @@
                                 		</label>
 									</p>
 								#end
-							#end
-						</td>
-						<td>					
-							#if($sent)
-								<p>
-									$submitted.get($submission.getSubmission().getId())
-								</p>
 							#else
 								<p>
-									not yet sent
+									$submitted.get($sub.getId())
 								</p>
-							#end							
+							#end
+						</td>
+						<td>
+							<p>					
+							#if($sent)
+								#if($reportUrls.get($sub.getId()))
+									<a href="$reportUrls.get($sub.getId())" rel="external">report available</a>
+								#else
+									report not yet available
+								#end
+							#else
+								not yet sent
+							#end
+							</p>							
 						</td>
 					</tr>
 					
@@ -110,14 +125,46 @@
 					#end
 				#end
 				#end
+				#if($toSubmit.size() > 0)
+				<tr class="$style">
+					<td colspan="2">
+					    <p>
+					        Search target: 
+					    </p>
+					</td>
+					<td colspan="2">
+					        <input class="config" id="config1" type="checkbox" name="internet_check" value="1" checked="true"/>
+					        <label for="config1">
+					            Internet
+					        </label>
+					        <br/>
+					        <input class="config" id="config2" type="checkbox" name="s_paper_check" value="1" checked="true"/>
+					        <label for="config2">
+					            TurnItIn papers
+					        </label>
+					        <br/>
+					        <input class="config" id="config3" type="checkbox" name="journal_check" value="1" checked="true"/>
+					        <label for="config3">
+					            Publication databases
+					        </label>
+					        <br/>
+					</td>
+				</tr>
+				#if($style == "odd")
+					#set($style = "even")
+				#else
+					#set($style = "odd")
+				#end
 				<tr class="$style">
 					<td colspan="2">
 						<p>Perform: </p>
 					</td>
 					<td colspan="2">
 						<p><input type="submit" value="Send to TurnItIn"/></p>
+						<input type="hidden" name="assignment" value="$assignment.getId()"/>
 					</td>
 				</tr>
+				#end
 				</tbody>
 			</table>
 			</form>

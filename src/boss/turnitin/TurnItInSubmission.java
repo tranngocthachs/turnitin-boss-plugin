@@ -5,6 +5,7 @@ import uk.ac.warwick.dcs.boss.plugins.spi.dao.PluginEntity;
 public class TurnItInSubmission extends PluginEntity {
 	private Long submissionId; // id the submission in BOSS
 	private String objectId; // id the submission on TurnItIn
+	private String filename; // the filename of the submission
 	
 	public Long getSubmissionId() {
 		return submissionId;
@@ -20,5 +21,11 @@ public class TurnItInSubmission extends PluginEntity {
 			objectId = objectId.trim();
 		}
 		this.objectId = objectId;
+	}
+	public String getFilename() {
+		return filename;
+	}
+	public void setFilename(String filename) {
+		this.filename = filename;
 	}
 }

@@ -1,5 +1,11 @@
 package boss.turnitin;
 
+import static boss.turnitin.TIICommResult.GET_ORI_SCORE_ERROR_CODE_FCMD2_NOT_YET_AVAI;
+import static boss.turnitin.TIICommResult.GET_ORI_SCORE_SUCCESS_CODE_FCMD2;
+import static boss.turnitin.TurnItInComm.createInstructorAndLogin;
+import static boss.turnitin.TurnItInComm.getOriginalityScore;
+import static boss.turnitin.TurnitinAPI.urlEnc;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -15,6 +21,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
 import uk.ac.warwick.dcs.boss.frontend.PageContext;
+import uk.ac.warwick.dcs.boss.frontend.sites.StaffPageFactory;
 import uk.ac.warwick.dcs.boss.model.FactoryException;
 import uk.ac.warwick.dcs.boss.model.FactoryRegistrar;
 import uk.ac.warwick.dcs.boss.model.dao.DAOException;
@@ -27,6 +34,7 @@ import uk.ac.warwick.dcs.boss.model.dao.IStaffInterfaceQueriesDAO;
 import uk.ac.warwick.dcs.boss.model.dao.IStaffInterfaceQueriesDAO.StaffSubmissionsQuerySortingType;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Assignment;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Module;
+import uk.ac.warwick.dcs.boss.model.dao.beans.Person;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Submission;
 import uk.ac.warwick.dcs.boss.model.dao.beans.queries.StaffSubmissionsQueryResult;
 import uk.ac.warwick.dcs.boss.plugins.spi.extralinks.StaffAssignmentPluginEntryProvider;
@@ -82,6 +90,14 @@ public class TurnItInSubmissionsPage extends StaffPluginPageProvider implements 
 				throw new ServletException("permission denied");
 			}
 			
+			Person staff = pageContext.getSession().getPersonBinding();
+			// Make sure the corresponding instructor account exists in TurnItIn system
+			TIICommResult commResult = createInstructorAndLogin(staff);
+			if (!commResult.isSuccessful()) {
+				pageContext.performRedirect(pageContext.getPageUrl(StaffPageFactory.SITE_NAME, "tii_error?ec="+commResult.getReturnCode()+"&em="+urlEnc(commResult.getReturnMessage())));
+				return;
+			}
+			
 			IModuleDAO moduleDao = f.getModuleDAOInstance();
 			Module module = moduleDao.retrievePersistentEntity(assignment.getModuleId());
 			templateContext.put("greet", pageContext.getSession().getPersonBinding().getChosenName());
@@ -94,8 +110,11 @@ public class TurnItInSubmissionsPage extends StaffPluginPageProvider implements 
 			// example of TurnItInSubmission used to query
 			TurnItInSubmission tiiSub = new TurnItInSubmission();
 			
-			// map of files that already submitted
+			// map of files that were already submitted
 			HashMap<Long, String> tiiOIDMapping = new HashMap<Long, String>();
+			
+			// map of files of which originality reports have been generated
+			HashMap<Long, String> tiiReportURLMapping = new HashMap<Long, String>();
 			
 			// map of files that are available to submit
 			HashMap<Long, List<String>> subFiles = new HashMap<Long, List<String>>();
@@ -104,7 +123,24 @@ public class TurnItInSubmissionsPage extends StaffPluginPageProvider implements 
 				tiiSub.setSubmissionId(submission.getId());
 				Collection<TurnItInSubmission> tiiSubs = tiiSubDao.findPersistentEntitiesByExample(tiiSub);
 				if (tiiSubs.size() == 1) { // already sent to TurnItIn
-					tiiOIDMapping.put(submission.getId(), tiiSubs.iterator().next().getObjectId());
+					TurnItInSubmission tiiSubmission = tiiSubs.iterator().next(); 
+					String oid = tiiSubmission.getObjectId();
+					tiiOIDMapping.put(submission.getId(), tiiSubmission.getFilename());
+					
+					// calling TII service to see if score is available
+					commResult = getOriginalityScore(staff, oid);
+					if (commResult.isSuccessful() && commResult.getReturnCode() == GET_ORI_SCORE_SUCCESS_CODE_FCMD2) {
+						// score is available
+						tiiReportURLMapping.put(submission.getId(), TurnItInComm.getOriginalityReportURL(staff, oid));
+					}
+					else if (!commResult.isSuccessful() && commResult.getReturnCode() == GET_ORI_SCORE_ERROR_CODE_FCMD2_NOT_YET_AVAI) {
+						// score is not yet available, do nothing
+					}
+					else {
+						// something wrong, redirect to error page
+						pageContext.performRedirect(pageContext.getPageUrl(StaffPageFactory.SITE_NAME, "tii_error?ec="+commResult.getReturnCode()+"&em="+urlEnc(commResult.getReturnMessage())));
+						return;
+					}
 				}
 				else if (tiiSubs.size() == 0) { // not yet sent
 					List<String> availFilenames = new LinkedList<String>();
@@ -125,6 +161,7 @@ public class TurnItInSubmissionsPage extends StaffPluginPageProvider implements 
 			templateContext.put("submitted", tiiOIDMapping);
 			templateContext.put("toSubmit", subFiles);
 			templateContext.put("submissions", submissions);
+			templateContext.put("reportUrls", tiiReportURLMapping);
 			f.endTransaction();
 			pageContext.renderTemplate(template, templateContext);
 		} catch (DAOException e) {
