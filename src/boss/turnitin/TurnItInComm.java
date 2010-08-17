@@ -15,6 +15,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import uk.ac.warwick.dcs.boss.model.dao.beans.Person;
@@ -23,7 +24,14 @@ import uk.ac.warwick.dcs.boss.plugins.PluginNotConfigurableException;
 public class TurnItInComm {
 
 	public static final Logger logger = Logger.getLogger(TurnItInComm.class);
-
+	
+	// silencing the httpclient logger
+	static {
+		Logger temp = Logger.getLogger("org.apache.http");
+		if (temp != null)
+			temp.setLevel(Level.INFO);
+	}
+	
 	/**
 	 * This method will communicate with TurnItIn web services to log a person
 	 * in as instructor. This instructor account will be created in TurnItIn's
@@ -53,7 +61,8 @@ public class TurnItInComm {
 
 		// Set the account information
 		tii_api.aid = prop.getProperty(TIIWSConfig.AID_PROP_KEY);
-		tii_api.shared_secret_key = prop.getProperty(TIIWSConfig.SECRETKEY_PROP_KEY);
+		tii_api.shared_secret_key = prop
+				.getProperty(TIIWSConfig.SECRETKEY_PROP_KEY);
 
 		// Set the required information. MD5 and GMT are created automatically.
 		tii_api.diagnostic = "0";
@@ -127,7 +136,8 @@ public class TurnItInComm {
 
 		// Set the account information
 		tii_api.aid = prop.getProperty(TIIWSConfig.AID_PROP_KEY);
-		tii_api.shared_secret_key = prop.getProperty(TIIWSConfig.SECRETKEY_PROP_KEY);
+		tii_api.shared_secret_key = prop
+				.getProperty(TIIWSConfig.SECRETKEY_PROP_KEY);
 
 		// Set the required information. MD5 and GMT are created automatically.
 		tii_api.diagnostic = "0";
@@ -226,7 +236,8 @@ public class TurnItInComm {
 
 		// Set the account information
 		tii_api.aid = prop.getProperty(TIIWSConfig.AID_PROP_KEY);
-		tii_api.shared_secret_key = prop.getProperty(TIIWSConfig.SECRETKEY_PROP_KEY);
+		tii_api.shared_secret_key = prop
+				.getProperty(TIIWSConfig.SECRETKEY_PROP_KEY);
 
 		// Set the required information. MD5 and GMT are created automatically.
 		tii_api.diagnostic = "0";
@@ -298,8 +309,9 @@ public class TurnItInComm {
 
 		// Set the account information
 		tii_api.aid = prop.getProperty(TIIWSConfig.AID_PROP_KEY);
-		tii_api.shared_secret_key = prop.getProperty(TIIWSConfig.SECRETKEY_PROP_KEY);
-		
+		tii_api.shared_secret_key = prop
+				.getProperty(TIIWSConfig.SECRETKEY_PROP_KEY);
+
 		// Set the required information. MD5 and GMT are created automatically.
 		tii_api.diagnostic = "0";
 		tii_api.encrypt = "0";
@@ -320,6 +332,75 @@ public class TurnItInComm {
 			return null;
 		}
 		return url;
+	}
+
+	/**
+	 * Delete a paper from TurnItIn for a given paper id. This call uses FID8
+	 * and FCMD2.
+	 * 
+	 * @param instructor
+	 * @param oid
+	 * @return result of the communication
+	 */
+	public static TIICommResult deleteAPaper(Person instructor, String oid) {
+		TIICommResult result = null;
+		// Create a Turnitin API object
+		TurnitinAPI tii_api = new TurnitinAPI();
+		Properties prop = null;
+		try {
+			prop = TIIWSConfig.getConfiguration("boss.turnitin");
+		} catch (PluginNotConfigurableException e) {
+			logger.fatal("shouldn't happen");
+			return null;
+		} catch (IOException e) {
+			logger.error("io error", e);
+			return null;
+		}
+		// Set the remote host
+		tii_api.remoteHost = prop.getProperty(TIIWSConfig.APIURL_PROP_KEY);
+
+		// Set the account information
+		tii_api.aid = prop.getProperty(TIIWSConfig.AID_PROP_KEY);
+		tii_api.shared_secret_key = prop
+				.getProperty(TIIWSConfig.SECRETKEY_PROP_KEY);
+
+		// Set the required information. MD5 and GMT are created automatically.
+		tii_api.diagnostic = "0";
+		tii_api.encrypt = "0";
+		tii_api.uem = instructor.getEmailAddress();
+		String[] names = instructor.getChosenName().split("\\s+");
+		tii_api.ufn = names[0];
+		tii_api.uln = names[names.length - 1];
+		tii_api.utp = "2";
+
+		tii_api.fid = "8";
+		tii_api.fcmd = "2";
+		tii_api.oid = oid.trim();
+
+		// send the request
+		String url = null;
+		try {
+			url = tii_api.getRedirectUrl();
+		} catch (Exception e) {
+			logger.error("error computing md5", e);
+			return null;
+		}
+		logger.info("sending get request: " + url);
+		HttpClient httpclient = new DefaultHttpClient();
+		HttpGet httpget = new HttpGet(url);
+		HttpResponse response;
+		try {
+			response = httpclient.execute(httpget);
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				result = new TIICommResult(entity.getContent());
+			}
+		} catch (ClientProtocolException e) {
+			logger.error("error sending request", e);
+		} catch (IOException e) {
+			logger.error("error sending request", e);
+		}
+		return result;
 	}
 
 	public static void main(String[] args) {

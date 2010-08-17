@@ -107,25 +107,38 @@ public class TurnItInSubmissionsPage extends StaffPluginPageProvider implements 
 			IEntityDAO<TurnItInSubmission> tiiSubDao = f.getAdditionalDAOInstance(TurnItInSubmission.class);
 			Collection<StaffSubmissionsQueryResult> submissions = staffInterfaceQueriesDAO.performStaffSubmissionsQuery(StaffSubmissionsQuerySortingType.SUBMISSION_TIME_DESCENDING, assignmentId);
 			Collection<String> reqFilenames = assignmentDao.fetchRequiredFilenames(assignmentId);
-			// example of TurnItInSubmission used to query
-			TurnItInSubmission tiiSub = new TurnItInSubmission();
 			
-			// map of files that were already submitted
-			HashMap<Long, String> tiiOIDMapping = new HashMap<Long, String>();
+			// map of submissionId => student
+			HashMap<Long, Person> subStdMapping = new HashMap<Long, Person>();
 			
-			// map of files of which originality reports have been generated
+			// map of submissionId => filename of submissions that were already sent to TurnItIn
+			HashMap<Long, String> submittedFiles = new HashMap<Long, String>();
+			
+			// map of submissionId => reportURLs of submissions that were sent to TurnItIn and reports are available
 			HashMap<Long, String> tiiReportURLMapping = new HashMap<Long, String>();
 			
-			// map of files that are available to submit
+			// map of submissionId => filenames that are available to submit (not yet send to TurnItIn)
 			HashMap<Long, List<String>> subFiles = new HashMap<Long, List<String>>();
+			
+			// example of TurnItInSubmission used to query
+			TurnItInSubmission tiiSub = new TurnItInSubmission();
 			for (StaffSubmissionsQueryResult sub : submissions) {
 				Submission submission = sub.getSubmission();
+				
+				// skip the inactive one
+				if (!submission.getActive())
+					continue;
+				
+				// put into the student map
+				subStdMapping.put(submission.getId(), sub.getPerson());
+				
+				// see if this has been sent
 				tiiSub.setSubmissionId(submission.getId());
 				Collection<TurnItInSubmission> tiiSubs = tiiSubDao.findPersistentEntitiesByExample(tiiSub);
 				if (tiiSubs.size() == 1) { // already sent to TurnItIn
 					TurnItInSubmission tiiSubmission = tiiSubs.iterator().next(); 
 					String oid = tiiSubmission.getObjectId();
-					tiiOIDMapping.put(submission.getId(), tiiSubmission.getFilename());
+					submittedFiles.put(submission.getId(), tiiSubmission.getFilename());
 					
 					// calling TII service to see if score is available
 					commResult = getOriginalityScore(staff, oid);
@@ -158,9 +171,9 @@ public class TurnItInSubmissionsPage extends StaffPluginPageProvider implements 
 					subFiles.put(submission.getId(), availFilenames);
 				}
 			}
-			templateContext.put("submitted", tiiOIDMapping);
+			templateContext.put("students", subStdMapping);
+			templateContext.put("submitted", submittedFiles);
 			templateContext.put("toSubmit", subFiles);
-			templateContext.put("submissions", submissions);
 			templateContext.put("reportUrls", tiiReportURLMapping);
 			f.endTransaction();
 			pageContext.renderTemplate(template, templateContext);

@@ -1,3 +1,4 @@
 boss.turnitin.TurnItInSubmissionsPage
-boss.turnitin.TurnItInPerformSubmissionPage
+boss.turnitin.TurnItInPerformSubmitPage
+boss.turnitin.TurnItInPerformDeletePage
 boss.turnitin.TurnItInErrorCallbackPage

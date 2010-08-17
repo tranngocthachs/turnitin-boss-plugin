@@ -10,7 +10,7 @@
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 		<script type="text/javascript">
 	        $(document).ready(function(){
-	            $('.files').click(function(){
+	            $('.send').click(function(){
 	                var temp = this.id;
 	                var elem = $('input[name=' + temp + ']');
 	                if ($(this).is(':checked')) {
@@ -59,115 +59,152 @@
 		</div>	
 					
 		<div class="table">
-			<form action="$context.getPageUrl("staff", "perform_turnitin_submit")" method="POST">
-			<table class="full">
-				<thead>
-					<tr>
-						<th>To Send</th>
-                        <th>Name</th>
-                        <th>Files</th>
-                        <th>Status</th>
-					</tr>
-				</thead>
-				<tbody>
-				#set($style="odd")				
-				#foreach($submission in $submissions)
-				#if($submission.getSubmission().getActive())
-					#set($sub = $submission.getSubmission())
-					#set($sent = $submitted.containsKey($sub.getId()))
-					<tr class="$style">
-						<td>
-							<p>
-                                <input class="files" type="checkbox" id="$submission.getSubmission().getId()" #if(!$sent)checked="true" #else disabled="true" #end/>
-                            </p>
-						</td>
-						<td>
-							<h3>$submission.getPerson().getUniqueIdentifier()</h3>
-							<p>
-								<a href="mailto:$submission.getPerson().getEmailAddress()">$submission.getPerson().getChosenName()</a>
-							</p>
-						</td>
-						<td>
-							#if(!$sent)
-								#foreach($file in $toSubmit.get($submission.getSubmission().getId()))
+			#set($style = "odd")
+			#if($toSubmit.size() > 0)
+				<h3>Submissions Ready to Send to TurnItIn</h3>
+				<form action="$context.getPageUrl("staff", "perform_turnitin_submit")" method="POST">
+				<table class="full">
+					<thead>
+						<tr>
+							<th>To Send</th>
+	                        <th>Student</th>
+	                        <th>Files</th>
+						</tr>
+					</thead>
+					<tbody>
+					#foreach($subId in $toSubmit.keySet())
+						<tr class="$style">
+							<td>
+								<p>
+	                                <input class="send" type="checkbox" id="$subId" checked="true"/>
+	                            </p>
+							</td>
+							<td>
+								<h3>$students.get($subId).getUniqueIdentifier()</h3>
+								<p>
+									<a href="mailto:$students.get($subId).getEmailAddress()">$students.get($subId).getChosenName()</a>
+								</p>
+							</td>
+							<td>
+								#foreach($file in $toSubmit.get($subId))
 									<p>
-										<input type="radio" name="$sub.getId()" id="$sub.getId()-$velocityCount" value="$file" #if($velocityCount == 1) checked="true" #end/>
-										<label for="$sub.getId()-$velocityCount">
-                                    	$file
-                                		</label>
+										<input type="radio" name="$subId" id="${subId}-$velocityCount" value="$file" #if($velocityCount == 1) checked="true" #end/>
+										<label for="${subId}-$velocityCount">
+	                                   	$file
+	                               		</label>
 									</p>
 								#end
-							#else
-								<p>
-									$submitted.get($sub.getId())
-								</p>
-							#end
+							</td>
+						</tr>
+						#if($style == "odd")
+							#set($style = "even")
+						#else
+							#set($style = "odd")
+						#end
+					#end
+					<tr class="$style">
+						<td colspan="2">
+						    <p>
+						        Search target: 
+						    </p>
 						</td>
 						<td>
-							<p>					
-							#if($sent)
-								#if($reportUrls.get($sub.getId()))
-									<a href="$reportUrls.get($sub.getId())" rel="external">report available</a>
-								#else
-									report not yet available
-								#end
-							#else
-								not yet sent
-							#end
-							</p>							
+						        <input class="config" id="config1" type="checkbox" name="internet_check" value="1" checked="true"/>
+						        <label for="config1">
+						            Internet
+						        </label>
+						        <br/>
+						        <input class="config" id="config2" type="checkbox" name="s_paper_check" value="1" checked="true"/>
+						        <label for="config2">
+						            TurnItIn papers
+						        </label>
+						        <br/>
+						        <input class="config" id="config3" type="checkbox" name="journal_check" value="1" checked="true"/>
+						        <label for="config3">
+						            Publication databases
+						        </label>
+						        <br/>
 						</td>
 					</tr>
-					
 					#if($style == "odd")
 						#set($style = "even")
 					#else
 						#set($style = "odd")
 					#end
-				#end
-				#end
-				#if($toSubmit.size() > 0)
-				<tr class="$style">
-					<td colspan="2">
-					    <p>
-					        Search target: 
-					    </p>
-					</td>
-					<td colspan="2">
-					        <input class="config" id="config1" type="checkbox" name="internet_check" value="1" checked="true"/>
-					        <label for="config1">
-					            Internet
-					        </label>
-					        <br/>
-					        <input class="config" id="config2" type="checkbox" name="s_paper_check" value="1" checked="true"/>
-					        <label for="config2">
-					            TurnItIn papers
-					        </label>
-					        <br/>
-					        <input class="config" id="config3" type="checkbox" name="journal_check" value="1" checked="true"/>
-					        <label for="config3">
-					            Publication databases
-					        </label>
-					        <br/>
-					</td>
-				</tr>
-				#if($style == "odd")
-					#set($style = "even")
-				#else
-					#set($style = "odd")
-				#end
-				<tr class="$style">
-					<td colspan="2">
-						<p>Perform: </p>
-					</td>
-					<td colspan="2">
-						<p><input type="submit" value="Send to TurnItIn"/></p>
-						<input type="hidden" name="assignment" value="$assignment.getId()"/>
-					</td>
-				</tr>
-				#end
-				</tbody>
-			</table>
-			</form>
+					<tr class="$style">
+						<td colspan="2">
+							<p>Perform: </p>
+						</td>
+						<td colspan="2">
+							<p><input type="submit" value="Send to TurnItIn"/></p>
+							<input type="hidden" name="assignment" value="$assignment.getId()"/>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+				</form>
+			#end
+			
+			#if($submitted.size() > 0)
+				<h3>Files Submitted to TurnItIn</h3>
+				<form action="$context.getPageUrl("staff", "perform_turnitin_delete")" method="POST">
+				<table class="full">
+					<thead>
+						<tr>
+							<th>To Delete</th>
+	                        <th>Student</th>
+	                        <th>File</th>
+	                        <th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+					#foreach($subId in $submitted.keySet())
+						<tr class="$style">
+							<td>
+								<p>
+	                                <input type="checkbox" name="$subId" value="1"/>
+	                            </p>
+							</td>
+							<td>
+								<h3>$students.get($subId).getUniqueIdentifier()</h3>
+								<p>
+									<a href="mailto:$students.get($subId).getEmailAddress()">$students.get($subId).getChosenName()</a>
+								</p>
+							</td>
+							<td>
+								<p>
+									$submitted.get($subId)
+								</p>
+							</td>
+							<td>
+								<p>
+									#if($reportUrls.containsKey($subId))
+										<a href="$reportUrls.get($subId)" rel="external">report available</a>
+									#else
+										report not yet available
+									#end
+								</p>
+							</td>
+						</tr>
+						#if($style == "odd")
+							#set($style = "even")
+						#else
+							#set($style = "odd")
+						#end
+					#end
+					<tr class="$style">
+						<td colspan="2">
+							<p>Perform: </p>
+						</td>
+						<td colspan="2">
+							<p><input type="submit" value="Delete from TurnItIn"/></p>
+							<input type="hidden" name="assignment" value="$assignment.getId()"/>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+				</form>
+			#end
 		</div>	
 		
 		<div class="navbar">

@@ -41,7 +41,7 @@ import uk.ac.warwick.dcs.boss.model.dao.beans.queries.StaffSubmissionsQueryResul
 import uk.ac.warwick.dcs.boss.model.testing.impl.TemporaryDirectory;
 import uk.ac.warwick.dcs.boss.plugins.spi.pages.StaffPluginPageProvider;
 
-public class TurnItInPerformSubmissionPage extends StaffPluginPageProvider {
+public class TurnItInPerformSubmitPage extends StaffPluginPageProvider {
 
 	@Override
 	public String getPageName() {
