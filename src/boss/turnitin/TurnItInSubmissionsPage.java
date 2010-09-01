@@ -1,10 +1,10 @@
 package boss.turnitin;
 
-import static boss.turnitin.TIICommResult.GET_ORI_SCORE_ERROR_CODE_FCMD2_NOT_YET_AVAI;
-import static boss.turnitin.TIICommResult.GET_ORI_SCORE_SUCCESS_CODE_FCMD2;
-import static boss.turnitin.TurnItInComm.createInstructorAndLogin;
-import static boss.turnitin.TurnItInComm.getOriginalityScore;
-import static boss.turnitin.TurnitinAPI.urlEnc;
+import static boss.turnitin.comm.TIICommResult.GET_ORI_SCORE_ERROR_CODE_FCMD2_NOT_YET_AVAI;
+import static boss.turnitin.comm.TIICommResult.GET_ORI_SCORE_SUCCESS_CODE_FCMD2;
+import static boss.turnitin.comm.TurnItInComm.createInstructorAndLogin;
+import static boss.turnitin.comm.TurnItInComm.getOriginalityScore;
+import static boss.turnitin.comm.TurnitinAPI.urlEnc;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +19,9 @@ import javax.servlet.ServletException;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
+
+import boss.turnitin.comm.TIICommResult;
+import boss.turnitin.comm.TurnItInComm;
 
 import uk.ac.warwick.dcs.boss.frontend.PageContext;
 import uk.ac.warwick.dcs.boss.frontend.sites.StaffPageFactory;
@@ -37,10 +40,10 @@ import uk.ac.warwick.dcs.boss.model.dao.beans.Module;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Person;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Submission;
 import uk.ac.warwick.dcs.boss.model.dao.beans.queries.StaffSubmissionsQueryResult;
-import uk.ac.warwick.dcs.boss.plugins.spi.extralinks.StaffAssignmentPluginEntryProvider;
-import uk.ac.warwick.dcs.boss.plugins.spi.pages.StaffPluginPageProvider;
+import uk.ac.warwick.dcs.boss.plugins.spi.extralinks.IStaffAssignmentPluginEntryLink;
+import uk.ac.warwick.dcs.boss.plugins.spi.pages.IStaffPluginPage;
 
-public class TurnItInSubmissionsPage extends StaffPluginPageProvider implements StaffAssignmentPluginEntryProvider {
+public class TurnItInSubmissionsPage extends IStaffPluginPage implements IStaffAssignmentPluginEntryLink {
 	
 	public String getPageName() {
 		return "tii_submissions";
@@ -50,7 +53,7 @@ public class TurnItInSubmissionsPage extends StaffPluginPageProvider implements 
 		return "Submit papers to TurnItIn";
 	}
 
-	public String getAssignmentParaString() {
+	public String getAssignmentParaName() {
 		return "assignment";
 	}
 
@@ -70,12 +73,12 @@ public class TurnItInSubmissionsPage extends StaffPluginPageProvider implements 
 		}
 		
 		// Get assignmentId
-		String assignmentString = pageContext.getParameter(getAssignmentParaString());
+		String assignmentString = pageContext.getParameter(getAssignmentParaName());
 		if (assignmentString == null) {
 			throw new ServletException("No assignment parameter given");
 		}
 		Long assignmentId = Long
-				.valueOf(pageContext.getParameter(getAssignmentParaString()));
+				.valueOf(pageContext.getParameter(getAssignmentParaName()));
 		
 		// Render page
 		try {

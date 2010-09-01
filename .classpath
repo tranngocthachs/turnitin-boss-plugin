@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v6.0"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/BOSS2"/>
 	<classpathentry kind="lib" path="/BOSS2/WebContent/WEB-INF/lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="/BOSS2/WebContent/WEB-INF/lib/velocity-1.6.4.jar" sourcepath="/Users/tranngocthachs/Downloads/velocity-1.6-1.4/velocity-1.6.4/bin/velocity-1.6.4-sources.jar"/>
 	<classpathentry kind="lib" path="lib/apache-mime4j-0.6.jar"/>
@@ -13,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/httpmime-4.0.1.jar"/>
 	<classpathentry kind="lib" path="/BOSS2/WebContent/WEB-INF/lib/commons-io-1.4.jar"/>
 	<classpathentry kind="lib" path="/BOSS2/WebContent/WEB-INF/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/BOSS2"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

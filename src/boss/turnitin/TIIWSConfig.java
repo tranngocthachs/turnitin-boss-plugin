@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import uk.ac.warwick.dcs.boss.model.ConfigurationOption;
-import uk.ac.warwick.dcs.boss.plugins.spi.config.PluginConfiguration;
+import uk.ac.warwick.dcs.boss.plugins.spi.config.IPluginConfiguration;
 
-public class TIIWSConfig extends PluginConfiguration {
+public class TIIWSConfig extends IPluginConfiguration {
 	public static final String AID_PROP_KEY = "tii.aid";
 	public static final String SECRETKEY_PROP_KEY = "tii.secretkey";
 	public static final String APIURL_PROP_KEY = "tii.apiurl";

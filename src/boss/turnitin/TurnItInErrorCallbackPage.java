@@ -8,9 +8,9 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
 import uk.ac.warwick.dcs.boss.frontend.PageContext;
-import uk.ac.warwick.dcs.boss.plugins.spi.pages.StaffPluginPageProvider;
+import uk.ac.warwick.dcs.boss.plugins.spi.pages.IStaffPluginPage;
 
-public class TurnItInErrorCallbackPage extends StaffPluginPageProvider {
+public class TurnItInErrorCallbackPage extends IStaffPluginPage {
 
 	@Override
 	public String getPageName() {
@@ -22,7 +22,6 @@ public class TurnItInErrorCallbackPage extends StaffPluginPageProvider {
 		return "staff_tii_error";
 	}
 
-	@Override
 	public void handleGet(PageContext pageContext, Template template,
 			VelocityContext templateContext) throws ServletException,
 			IOException {
@@ -35,11 +34,9 @@ public class TurnItInErrorCallbackPage extends StaffPluginPageProvider {
 		pageContext.renderTemplate(template, templateContext);
 	}
 
-	@Override
 	public void handlePost(PageContext pageContext, Template template,
 			VelocityContext templateContext) throws ServletException,
 			IOException {
 		throw new ServletException("Unexpected POST request");
 	}
-
 }

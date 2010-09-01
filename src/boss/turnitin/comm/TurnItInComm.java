@@ -1,4 +1,4 @@
-package boss.turnitin;
+package boss.turnitin.comm;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +17,8 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import boss.turnitin.TIIWSConfig;
 
 import uk.ac.warwick.dcs.boss.model.dao.beans.Person;
 import uk.ac.warwick.dcs.boss.plugins.PluginNotConfigurableException;

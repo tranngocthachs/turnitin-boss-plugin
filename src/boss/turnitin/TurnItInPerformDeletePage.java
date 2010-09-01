@@ -1,7 +1,7 @@
 package boss.turnitin;
 
-import static boss.turnitin.TurnItInComm.deleteAPaper;
-import static boss.turnitin.TurnitinAPI.urlEnc;
+import static boss.turnitin.comm.TurnItInComm.deleteAPaper;
+import static boss.turnitin.comm.TurnitinAPI.urlEnc;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
+
+import boss.turnitin.comm.TIICommResult;
 
 import uk.ac.warwick.dcs.boss.frontend.PageContext;
 import uk.ac.warwick.dcs.boss.frontend.sites.StaffPageFactory;
@@ -26,9 +28,9 @@ import uk.ac.warwick.dcs.boss.model.dao.beans.Assignment;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Person;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Submission;
 import uk.ac.warwick.dcs.boss.model.dao.beans.queries.StaffSubmissionsQueryResult;
-import uk.ac.warwick.dcs.boss.plugins.spi.pages.StaffPluginPageProvider;
+import uk.ac.warwick.dcs.boss.plugins.spi.pages.IStaffPluginPage;
 
-public class TurnItInPerformDeletePage extends StaffPluginPageProvider {
+public class TurnItInPerformDeletePage extends IStaffPluginPage {
 
 	@Override
 	public String getPageName() {

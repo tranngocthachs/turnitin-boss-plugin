@@ -7,9 +7,9 @@ import java.util.Collection;
 
 import uk.ac.warwick.dcs.boss.model.dao.DAOException;
 import uk.ac.warwick.dcs.boss.plugins.dbschema.SQLTableSchema;
-import uk.ac.warwick.dcs.boss.plugins.spi.dao.PluginEntityDAO;
+import uk.ac.warwick.dcs.boss.plugins.spi.dao.IPluginDBMapping;
 
-public class TurnItInSubDAO extends PluginEntityDAO<TurnItInSubmission> {
+public class TurnItInSubDBMapping extends IPluginDBMapping<TurnItInSubmission> {
 
 	@Override
 	public String getTableName() {

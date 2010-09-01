@@ -1,18 +1,16 @@
 package boss.turnitin;
 
-import static boss.turnitin.TIICommResult.OBJECT_ID;
-import static boss.turnitin.TurnItInComm.quickSubmitAPaper;
-import static boss.turnitin.TurnitinAPI.urlEnc;
+import static boss.turnitin.comm.TIICommResult.OBJECT_ID;
+import static boss.turnitin.comm.TurnItInComm.quickSubmitAPaper;
+import static boss.turnitin.comm.TurnitinAPI.urlEnc;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -22,6 +20,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
+
+import boss.turnitin.comm.TIICommResult;
 
 import uk.ac.warwick.dcs.boss.frontend.PageContext;
 import uk.ac.warwick.dcs.boss.frontend.sites.StaffPageFactory;
@@ -39,9 +39,9 @@ import uk.ac.warwick.dcs.boss.model.dao.beans.Person;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Submission;
 import uk.ac.warwick.dcs.boss.model.dao.beans.queries.StaffSubmissionsQueryResult;
 import uk.ac.warwick.dcs.boss.model.testing.impl.TemporaryDirectory;
-import uk.ac.warwick.dcs.boss.plugins.spi.pages.StaffPluginPageProvider;
+import uk.ac.warwick.dcs.boss.plugins.spi.pages.IStaffPluginPage;
 
-public class TurnItInPerformSubmitPage extends StaffPluginPageProvider {
+public class TurnItInPerformSubmitPage extends IStaffPluginPage {
 
 	@Override
 	public String getPageName() {
@@ -133,16 +133,12 @@ public class TurnItInPerformSubmitPage extends StaffPluginPageProvider {
 							.valueOf(sub.getId()));
 					File tempDir;
 					try {
-						InputStream is = new FileInputStream(new File(
-								pageContext.getConfigurationFilePath()));
-						Properties prop = new Properties();
-						prop.load(is);
 						tempDir = TemporaryDirectory.createTempDir(
 								"tii_submit",
-								new File(prop.getProperty("testing.temp_dir")));
+								pageContext.getTestingDir());
 					} catch (IOException e) {
 						throw new ServletException(
-								"couldn't create sherlock temp dir", e);
+								"couldn't create temp dir", e);
 					}
 					File subTempFile = new File(tempDir,
 							sub.getResourceSubdirectory() + ".zip");

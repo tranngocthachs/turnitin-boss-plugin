@@ -1,4 +1,4 @@
-package boss.turnitin;
+package boss.turnitin.comm;
 
 import java.io.IOException;
 import java.io.InputStream;

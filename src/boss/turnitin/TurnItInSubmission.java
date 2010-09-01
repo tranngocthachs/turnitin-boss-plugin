@@ -1,8 +1,8 @@
 package boss.turnitin;
 
-import uk.ac.warwick.dcs.boss.plugins.spi.dao.PluginEntity;
+import uk.ac.warwick.dcs.boss.plugins.spi.dao.IPluginEntity;
 
-public class TurnItInSubmission extends PluginEntity {
+public class TurnItInSubmission extends IPluginEntity {
 	private Long submissionId; // id the submission in BOSS
 	private String objectId; // id the submission on TurnItIn
 	private String filename; // the filename of the submission
