@@ -7,8 +7,9 @@ import javax.servlet.ServletException;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
+import boss.plugins.spi.pages.IStaffPluginPage;
+
 import uk.ac.warwick.dcs.boss.frontend.PageContext;
-import uk.ac.warwick.dcs.boss.plugins.spi.pages.IStaffPluginPage;
 
 public class TurnItInErrorCallbackPage extends IStaffPluginPage {
 

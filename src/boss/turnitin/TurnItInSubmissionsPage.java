@@ -20,6 +20,8 @@ import javax.servlet.ServletException;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
+import boss.plugins.spi.extralinks.IStaffAssignmentPluginEntryLink;
+import boss.plugins.spi.pages.IStaffPluginPage;
 import boss.turnitin.comm.TIICommResult;
 import boss.turnitin.comm.TurnItInComm;
 
@@ -40,8 +42,6 @@ import uk.ac.warwick.dcs.boss.model.dao.beans.Module;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Person;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Submission;
 import uk.ac.warwick.dcs.boss.model.dao.beans.queries.StaffSubmissionsQueryResult;
-import uk.ac.warwick.dcs.boss.plugins.spi.extralinks.IStaffAssignmentPluginEntryLink;
-import uk.ac.warwick.dcs.boss.plugins.spi.pages.IStaffPluginPage;
 
 public class TurnItInSubmissionsPage extends IStaffPluginPage implements IStaffAssignmentPluginEntryLink {
 	

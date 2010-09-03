@@ -5,9 +5,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import boss.plugins.dbschema.SQLTableSchema;
+import boss.plugins.spi.dao.IPluginDBMapping;
+
 import uk.ac.warwick.dcs.boss.model.dao.DAOException;
-import uk.ac.warwick.dcs.boss.plugins.dbschema.SQLTableSchema;
-import uk.ac.warwick.dcs.boss.plugins.spi.dao.IPluginDBMapping;
 
 public class TurnItInSubDBMapping extends IPluginDBMapping<TurnItInSubmission> {
 

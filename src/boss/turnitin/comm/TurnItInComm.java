@@ -18,10 +18,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import boss.plugins.PluginNotConfigurableException;
 import boss.turnitin.TIIWSConfig;
 
 import uk.ac.warwick.dcs.boss.model.dao.beans.Person;
-import uk.ac.warwick.dcs.boss.plugins.PluginNotConfigurableException;
 
 public class TurnItInComm {
 

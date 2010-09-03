@@ -3,8 +3,9 @@ package boss.turnitin;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import boss.plugins.spi.config.IPluginConfiguration;
+
 import uk.ac.warwick.dcs.boss.model.ConfigurationOption;
-import uk.ac.warwick.dcs.boss.plugins.spi.config.IPluginConfiguration;
 
 public class TIIWSConfig extends IPluginConfiguration {
 	public static final String AID_PROP_KEY = "tii.aid";

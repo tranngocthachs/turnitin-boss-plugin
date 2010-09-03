@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
+import boss.plugins.spi.pages.IStaffPluginPage;
 import boss.turnitin.comm.TIICommResult;
 
 import uk.ac.warwick.dcs.boss.frontend.PageContext;
@@ -28,7 +29,6 @@ import uk.ac.warwick.dcs.boss.model.dao.beans.Assignment;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Person;
 import uk.ac.warwick.dcs.boss.model.dao.beans.Submission;
 import uk.ac.warwick.dcs.boss.model.dao.beans.queries.StaffSubmissionsQueryResult;
-import uk.ac.warwick.dcs.boss.plugins.spi.pages.IStaffPluginPage;
 
 public class TurnItInPerformDeletePage extends IStaffPluginPage {
 
