@@ -121,7 +121,7 @@ public class TurnItInPerformSubmitPage extends IStaffPluginPage {
 			IStaffInterfaceQueriesDAO staffInterfaceQueriesDAO = f
 					.getStaffInterfaceQueriesDAOInstance();
 			IEntityDAO<TurnItInSubmission> tiiSubDao = f
-					.getAdditionalDAOInstance(TurnItInSubmission.class);
+					.getPluginDAOInstance(TurnItInSubmission.class);
 			Collection<StaffSubmissionsQueryResult> submissions = staffInterfaceQueriesDAO
 					.performStaffSubmissionsQuery(
 							StaffSubmissionsQuerySortingType.SUBMISSION_TIME_DESCENDING,

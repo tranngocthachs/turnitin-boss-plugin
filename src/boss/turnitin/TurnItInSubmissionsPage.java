@@ -107,7 +107,7 @@ public class TurnItInSubmissionsPage extends IStaffPluginPage implements IStaffA
 			templateContext.put("module", module);
 			templateContext.put("assignment", assignment);
 			IStaffInterfaceQueriesDAO staffInterfaceQueriesDAO = f.getStaffInterfaceQueriesDAOInstance();
-			IEntityDAO<TurnItInSubmission> tiiSubDao = f.getAdditionalDAOInstance(TurnItInSubmission.class);
+			IEntityDAO<TurnItInSubmission> tiiSubDao = f.getPluginDAOInstance(TurnItInSubmission.class);
 			Collection<StaffSubmissionsQueryResult> submissions = staffInterfaceQueriesDAO.performStaffSubmissionsQuery(StaffSubmissionsQuerySortingType.SUBMISSION_TIME_DESCENDING, assignmentId);
 			Collection<String> reqFilenames = assignmentDao.fetchRequiredFilenames(assignmentId);
 			
