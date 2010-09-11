@@ -12,6 +12,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
 import boss.plugins.spi.pages.IStaffPluginPage;
+import boss.turnitin.comm.MalformedTIIResponseException;
 import boss.turnitin.comm.TIICommResult;
 
 import uk.ac.warwick.dcs.boss.frontend.PageContext;
@@ -111,7 +112,20 @@ public class TurnItInPerformDeletePage extends IStaffPluginPage {
 						TurnItInSubmission tiiSub = tiiSubs.iterator().next();
 						
 						// delete the file on Turn
-						TIICommResult result = deleteAPaper(staff, tiiSub.getObjectId());
+						TIICommResult result;
+						try {
+							result = deleteAPaper(staff, tiiSub.getObjectId());
+						} catch (MalformedTIIResponseException e) {
+							pageContext
+							.performRedirect(pageContext
+									.getPageUrl(
+											StaffPageFactory.SITE_NAME,
+											"tii_error?em="
+													+ urlEnc("Unrecognised TurnItIn's returned message. "
+															+ "Make sure the URL of TurnItIn API is correct.")));
+							f.abortTransaction();
+							return;
+						}
 						if (!result.isSuccessful()) {
 							pageContext.performRedirect(pageContext.getPageUrl(
 									StaffPageFactory.SITE_NAME, "tii_error")
@@ -119,6 +133,7 @@ public class TurnItInPerformDeletePage extends IStaffPluginPage {
 									+ result.getReturnCode()
 									+ "&em="
 									+ urlEnc(result.getReturnMessage()));
+							f.abortTransaction();
 							return;
 						}
 

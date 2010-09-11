@@ -22,6 +22,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
 import boss.plugins.spi.pages.IStaffPluginPage;
+import boss.turnitin.comm.MalformedTIIResponseException;
 import boss.turnitin.comm.TIICommResult;
 
 import uk.ac.warwick.dcs.boss.frontend.PageContext;
@@ -160,10 +161,23 @@ public class TurnItInPerformSubmitPage extends IStaffPluginPage {
 									new FileOutputStream(fileToSend));
 
 							// sending the file to TurnItIn
-							TIICommResult result = quickSubmitAPaper(staff,
-									submission.getPerson(), fileToSend,
-									assignment.getName(), internetCheck,
-									paperCheck, journalCheck);
+							TIICommResult result;
+							try {
+								result = quickSubmitAPaper(staff,
+										submission.getPerson(), fileToSend,
+										assignment.getName(), internetCheck,
+										paperCheck, journalCheck);
+							} catch (MalformedTIIResponseException e) {
+								pageContext
+								.performRedirect(pageContext
+										.getPageUrl(
+												StaffPageFactory.SITE_NAME,
+												"tii_error?em="
+														+ urlEnc("Unrecognised TurnItIn's returned message. "
+																+ "Make sure the URL of TurnItIn API is correct.")));
+								f.abortTransaction();
+								return;
+							}
 							if (!result.isSuccessful()) {
 								pageContext.performRedirect(pageContext
 										.getPageUrl(StaffPageFactory.SITE_NAME,
@@ -172,6 +186,7 @@ public class TurnItInPerformSubmitPage extends IStaffPluginPage {
 										+ result.getReturnCode()
 										+ "&em="
 										+ urlEnc(result.getReturnMessage()));
+								f.abortTransaction();
 								return;
 							}
 
