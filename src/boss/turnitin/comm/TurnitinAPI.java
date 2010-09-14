@@ -1,3 +1,7 @@
+/*
+	This class is from the TurnItIn's API starter code provided by TurnItIn at
+	http://turnitin.com/static/integration/develop_own_api.html
+ */
 package boss.turnitin.comm;
 
 import java.io.UnsupportedEncodingException;
