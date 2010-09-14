@@ -34,21 +34,19 @@ public class TIICommResult {
 	 * XML Document)
 	 * 
 	 * @param returnXML
-	 * @throws ParserConfigurationException 
 	 * @throws IOException 
-	 * @throws SAXException 
+	 * @throws MalformedTIIResponseException 
 	 */
-	public TIICommResult(InputStream in) throws IOException {
+	public TIICommResult(InputStream in) throws IOException, MalformedTIIResponseException {
 		try {
 			returnXML = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
 		} catch (SAXException e) {
-			e.printStackTrace();
-			return;
+			throw new MalformedTIIResponseException();
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			return;
 		}
-		
+		boolean malformed = false;
 		if (returnXML != null) {
 			NodeList rcodeList = returnXML.getElementsByTagName(RCODE);
 			if (rcodeList.getLength() == 1) {
@@ -57,16 +55,26 @@ public class TIICommResult {
 					int rcode = Integer.parseInt(rcodeStr);
 					this.rcode = rcode;
 				} catch (NumberFormatException e) {
-					e.printStackTrace();
-					return;
+					malformed = true;
 				}
+			}
+			else {
+				malformed = true;
 			}
 			
 			NodeList rmsgList = returnXML.getElementsByTagName(RMESSAGE);
 			if (rmsgList.getLength() == 1) {
 				rmessage = rmsgList.item(0).getTextContent().trim();
 			}
+			else {
+				malformed = true;
+			}
 		}
+		else {
+			malformed = true;
+		}
+		if (malformed)
+			throw new MalformedTIIResponseException();
 	}
 	
 	public boolean isSuccessful() {
@@ -99,7 +107,7 @@ public class TIICommResult {
 		this.returnXML = returnXML;
 	}
 	
-	public static void main(String args[]) throws ClientProtocolException, IOException {
+	public static void main(String args[]) throws ClientProtocolException, IOException, MalformedTIIResponseException {
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpGet httpget = new HttpGet("https://submit.ac.uk/api.asp?encrypt=0&aid=2000");
 		HttpResponse response = httpclient.execute(httpget);

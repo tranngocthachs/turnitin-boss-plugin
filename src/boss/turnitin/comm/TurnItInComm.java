@@ -42,8 +42,9 @@ public class TurnItInComm {
 	 * 
 	 * @param person
 	 * @return result of the communication
+	 * @throws MalformedTIIResponseException 
 	 */
-	public static TIICommResult createInstructorAndLogin(Person person) {
+	public static TIICommResult createInstructorAndLogin(Person person) throws MalformedTIIResponseException {
 		TIICommResult result = null;
 
 		// Create a Turnitin API object
@@ -115,11 +116,12 @@ public class TurnItInComm {
 	 * @param submittingFile
 	 * @param paperTitle
 	 * @return result of the communication
+	 * @throws MalformedTIIResponseException 
 	 */
 	public static TIICommResult quickSubmitAPaper(Person instructor,
 			Person paperAuthor, File submittingFile, String paperTitle,
 			boolean internetCheck, boolean submittedPaperCheck,
-			boolean journalCheck) {
+			boolean journalCheck) throws MalformedTIIResponseException {
 		TIICommResult result = null;
 		// Create a Turnitin API object
 		TurnitinAPI tii_api = new TurnitinAPI();
@@ -217,9 +219,10 @@ public class TurnItInComm {
 	 * @param instructor
 	 * @param oid
 	 * @return result of the communication
+	 * @throws MalformedTIIResponseException 
 	 */
 	public static TIICommResult getOriginalityScore(Person instructor,
-			String oid) {
+			String oid) throws MalformedTIIResponseException {
 		TIICommResult result = null;
 		// Create a Turnitin API object
 		TurnitinAPI tii_api = new TurnitinAPI();
@@ -343,8 +346,9 @@ public class TurnItInComm {
 	 * @param instructor
 	 * @param oid
 	 * @return result of the communication
+	 * @throws MalformedTIIResponseException 
 	 */
-	public static TIICommResult deleteAPaper(Person instructor, String oid) {
+	public static TIICommResult deleteAPaper(Person instructor, String oid) throws MalformedTIIResponseException {
 		TIICommResult result = null;
 		// Create a Turnitin API object
 		TurnitinAPI tii_api = new TurnitinAPI();
